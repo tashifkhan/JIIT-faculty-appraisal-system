@@ -11,6 +11,7 @@ import {
 	logout,
 	isAuthenticated,
 } from "@/lib/localStorage";
+import { useSession, signOut } from "next-auth/react";
 import { AppraisalData, SectionStatus, ScoredItem } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -27,11 +28,14 @@ export default function AppraisalLayout({ children }: AppraisalLayoutProps) {
 		typeof window !== "undefined" ? window.innerWidth >= 768 : true
 	);
 	const [appraisalData, setAppraisalData] = useState(getAppraisalData());
-	const user = getUser();
+	const { data: session, status } = useSession();
+	const user = (session?.user as any) ?? getUser();
 
 	useEffect(() => {
-		// Check authentication
-		if (!isAuthenticated()) {
+		// Wait for NextAuth session to resolve. If no NextAuth session AND no localStorage auth, redirect to login
+		if (status === "loading") return;
+
+		if (status === "unauthenticated" && !isAuthenticated()) {
 			router.push("/login");
 			return;
 		}
@@ -43,9 +47,15 @@ export default function AppraisalLayout({ children }: AppraisalLayoutProps) {
 		if (typeof window !== "undefined" && window.innerWidth < 768) {
 			setSidebarOpen(false);
 		}
-	}, [pathname, router]);
+	}, [pathname, router, status]);
 
-	const handleLogout = () => {
+	const handleLogout = async () => {
+		// Clear NextAuth session and localStorage data
+		try {
+			await signOut({ redirect: false });
+		} catch (e) {
+			// ignore
+		}
 		logout();
 		router.push("/login");
 	};

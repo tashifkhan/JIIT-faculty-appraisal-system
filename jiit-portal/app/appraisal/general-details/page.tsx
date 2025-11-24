@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ export default function GeneralDetails() {
 	const { register, handleSubmit, reset, setValue } =
 		useForm<GeneralDetailsForm>({
 			defaultValues: {
-				name: "Dr. Shikha K Mehta",
+				name: "",
 				presentDesignation: "",
 				qualifications: "",
 				department: "Computer Science & Engineering",
@@ -69,6 +69,34 @@ export default function GeneralDetails() {
 		}
 	}, [reset]);
 
+	const formRef = useRef<HTMLFormElement | null>(null);
+
+	const isFormComplete = () => {
+		if (!formRef.current) return false;
+		const elements = Array.from(formRef.current.querySelectorAll('input, textarea, select')) as Array<HTMLElement>;
+		for (const el of elements) {
+			const input = el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+			if ((input as HTMLInputElement).disabled) continue;
+			const tag = input.tagName.toLowerCase();
+			if (tag === 'select') {
+				if (!(input as HTMLSelectElement).value) return false;
+			} else if ((input as HTMLInputElement).type === 'radio') {
+				const name = (input as HTMLInputElement).name;
+				if (name) {
+					const checked = formRef.current.querySelectorAll(`input[type="radio"][name="${name}"]:checked`);
+					if (checked.length === 0) return false;
+				}
+			} else if ((input as HTMLInputElement).type === 'checkbox') {
+				// require checkbox to be checked
+				if (!(input as HTMLInputElement).checked) return false;
+			} else {
+				const val = (input as HTMLInputElement).value;
+				if (val === null || val === undefined || val.toString().trim() === '') return false;
+			}
+		}
+		return true;
+	};
+
 	const onSubmit = async (data: GeneralDetailsForm) => {
 		setIsSubmitting(true);
 		try {
@@ -86,30 +114,39 @@ export default function GeneralDetails() {
 
 	return (
 		<AppraisalLayout>
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-2xl">1. General Details</CardTitle>
-					<CardDescription>
-						Provide your basic information and qualifications
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					{apiScore !== null && (
-						<div className="mb-6 rounded-lg bg-success/10 border border-success/20 p-4">
-							<p className="text-sm font-medium text-success">
-								✓ Section Completed - API Score: {apiScore}
-							</p>
-						</div>
-					)}
+			<div className="relative">
+				<Button
+					variant="ghost"
+					onClick={() => router.push("/dashboard")}
+					aria-label="Back to dashboard"
+					className="absolute -top-1 -left-12 p-2 "
+				>
+					<ArrowLeft className="h-7 w-7" />
+				</Button>
+				<Card>
+					<CardHeader>
+						<CardTitle className="text-2xl">1. General Details</CardTitle>
+						<CardDescription>
+							Provide your basic information and qualifications
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						{apiScore !== null && (
+							<div className="mb-6 rounded-lg bg-success/10 border border-success/20 p-4">
+								<p className="text-sm font-medium text-success">
+									✓ Section Completed - API Score: {apiScore}
+								</p>
+							</div>
+						)}
 
-					<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+						<form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 						<div className="grid gap-4 md:grid-cols-2">
 							<div className="space-y-2">
 								<Label htmlFor="name">Full Name</Label>
 								<Input
 									id="name"
 									{...register("name")}
-									disabled
+								placeholder="Dr Shikha K Mehta"
 									className="bg-muted"
 								/>
 							</div>
@@ -237,9 +274,9 @@ export default function GeneralDetails() {
 						</div>
 
 						<div className="flex flex-col sm:flex-row justify-between gap-3 pt-4 border-t">
-							<Button type="button" variant="outline" disabled>
+							<Button type="button" variant="outline" onClick={() => router.push('/dashboard')}>
 								<ArrowLeft className="h-4 w-4 mr-2" />
-								Previous
+								Back
 							</Button>
 
 							<Button
@@ -255,7 +292,13 @@ export default function GeneralDetails() {
 								<Button
 									type="button"
 									variant="outline"
-									onClick={() => router.push(nextSection.route)}
+									onClick={() => {
+										if (!isFormComplete()) {
+											toast.error("Please fill all fields before proceeding to next section");
+											return;
+										}
+										router.push(nextSection.route);
+									}}
 									className="sm:order-3"
 								>
 									Next
@@ -265,7 +308,8 @@ export default function GeneralDetails() {
 						</div>
 					</form>
 				</CardContent>
-			</Card>
+				</Card>
+			</div>
 		</AppraisalLayout>
 	);
 }

@@ -413,7 +413,7 @@ export default function StudentActivitiesPage() {
 																ev.target.value
 															)
 														}
-														placeholder="e.g., Google Developer Group"
+														placeholder="e.g., Google Developers Group"
 													/>
 												</div>
 												<div className="space-y-1">
@@ -499,7 +499,7 @@ export default function StudentActivitiesPage() {
 																		ev.target.value
 																	)
 																}
-																placeholder="e.g., Google Developer Group"
+																placeholder="e.g., Google Developers Group"
 															/>
 														</td>
 														<td className="p-3">

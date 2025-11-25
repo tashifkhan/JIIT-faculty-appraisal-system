@@ -166,7 +166,12 @@ export default function Login() {
           toast.error("Authentication failed. Please try again.");
         } else {
           toast.success("Login successful!");
-          router.push("/dashboard");
+          // Hardcoded HOD redirect
+          if (identifier.trim().toUpperCase() === "JIIT1137") {
+            router.push("/hod/dashboard");
+          } else {
+            router.push("/dashboard");
+          }
         }
       }
     } catch (error) {

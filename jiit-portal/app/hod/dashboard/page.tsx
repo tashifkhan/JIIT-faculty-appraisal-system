@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { signOut } from "next-auth/react";
 import {
     Card,
     CardContent,
@@ -240,7 +241,10 @@ export default function HODDashboard() {
                         <h1 className="text-3xl font-bold tracking-tight">Department Dashboard</h1>
                         <p className="text-muted-foreground">Overview of faculty performance appraisals</p>
                     </div>
-                    <div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" onClick={() => signOut({ callbackUrl: "/login" })} className="hidden md:inline-flex">
+                            Logout
+                        </Button>
                         <Button variant="outline" onClick={handleDownloadReport} className="w-full md:w-auto">
                             <Download className="mr-2 h-4 w-4" /> Download Report
                         </Button>

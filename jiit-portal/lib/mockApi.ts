@@ -225,12 +225,48 @@ export const calculateLecturesScore = async (
 };
 
 // ==================== Item 12.2: Reading Material ====================
-// Note: Backend doesn't have a specific endpoint for item 12.2 yet
-// Using mock calculation for now
 
-export const calculateReadingMaterialScore = (entries: ReadingMaterialEntry[]): number => {
-  // Mock: sum of self-assessed API scores, capped per entry at 5
-  return entries.reduce((total, e) => total + Math.min(Math.max(Number(e.selfAssessedApi) || 0, 0), 5), 0);
+/**
+ * Transform frontend ReadingMaterialEntry to backend schema (item4_post_schema)
+ */
+function transformReadingMaterialToBackend(entries: ReadingMaterialEntry[]) {
+  return entries.map((entry) => ({
+    course_code: entry.courseCode,
+    consulted: entry.consulted,
+    prescribed: entry.prescribed,
+    additional: entry.additional,
+    participatory_methodologies: entry.participatoryMethodologies || "",
+    modification_to_syllabus: entry.modificationToSyllabus || "",
+    coverage_beyond_syllabus: entry.coverageBeyondSyllabus || "",
+  }));
+}
+
+export const calculateReadingMaterialScore = async (
+  entries: ReadingMaterialEntry[],
+  userId?: string
+): Promise<{ score: number; message: string }> => {
+  const user_id = userId || getUserId();
+  const data = transformReadingMaterialToBackend(entries);
+  
+  const payload = {
+    user_id,
+    data,
+  };
+
+  const response = await apiFetch<ApiResponse>(
+    API_ENDPOINTS.INJEST_ITEM_12_2,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const score = response.result?.score || 0;
+  
+  return {
+    score,
+    message: response.message || 'Section submitted successfully',
+  };
 };
 
 // ==================== Item 12.3-12.4: Project Guidance & Exam Duties ====================
@@ -696,14 +732,9 @@ export const simulateApiCall = async <T extends SectionId>(
         );
       
       case '12-2-reading-material': {
-        // Using mock for now since backend doesn't have this endpoint
-        const score = calculateReadingMaterialScore(
+        return await calculateReadingMaterialScore(
           (data as ReadingMaterialSection | { entries: ReadingMaterialEntry[] }).entries || []
         );
-        return {
-          score,
-          message: `Section submitted successfully. API Score: ${score}`,
-        };
       }
       
       case '12-3-4-project-guidance-and-exam-duties': {

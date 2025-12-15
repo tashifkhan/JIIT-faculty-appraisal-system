@@ -34,6 +34,9 @@ export default function ReadingMaterialPage() {
 			consulted: "",
 			prescribed: "",
 			additional: "",
+			participatoryMethodologies: "",
+			modificationToSyllabus: "",
+			coverageBeyondSyllabus: "",
 			selfAssessedApi: 0,
 			hodRemarks: "Pending",
 		},
@@ -72,6 +75,9 @@ export default function ReadingMaterialPage() {
 				consulted: "",
 				prescribed: "",
 				additional: "",
+				participatoryMethodologies: "",
+				modificationToSyllabus: "",
+				coverageBeyondSyllabus: "",
 				selfAssessedApi: 0,
 				hodRemarks: "Pending",
 			},
@@ -166,6 +172,42 @@ export default function ReadingMaterialPage() {
 											}
 											placeholder="Additional Resources Provided"
 										/>
+										<Textarea
+											rows={2}
+											value={e.participatoryMethodologies || ""}
+											onChange={(ev) =>
+												updateEntry(
+													e.id,
+													"participatoryMethodologies",
+													ev.target.value
+												)
+											}
+											placeholder="Participatory Methodologies"
+										/>
+										<Textarea
+											rows={2}
+											value={e.modificationToSyllabus || ""}
+											onChange={(ev) =>
+												updateEntry(
+													e.id,
+													"modificationToSyllabus",
+													ev.target.value
+												)
+											}
+											placeholder="Modification to Syllabus"
+										/>
+										<Textarea
+											rows={2}
+											value={e.coverageBeyondSyllabus || ""}
+											onChange={(ev) =>
+												updateEntry(
+													e.id,
+													"coverageBeyondSyllabus",
+													ev.target.value
+												)
+											}
+											placeholder="Coverage Beyond Syllabus"
+										/>
 										<div className="flex justify-end">
 											<Button
 												variant="ghost"
@@ -201,6 +243,15 @@ export default function ReadingMaterialPage() {
 											</th>
 											<th className="px-4 py-3 text-left">
 												Additional Resources Provided
+											</th>
+											<th className="px-4 py-3 text-left">
+												Participatory Methodologies
+											</th>
+											<th className="px-4 py-3 text-left">
+												Modification to Syllabus
+											</th>
+											<th className="px-4 py-3 text-left">
+												Coverage Beyond Syllabus
 											</th>
 											<th className="px-4 py-3"></th>
 										</tr>
@@ -245,6 +296,48 @@ export default function ReadingMaterialPage() {
 															updateEntry(e.id, "additional", ev.target.value)
 														}
 														placeholder="Lecture notes, examples, links..."
+													/>
+												</td>
+												<td className="px-4 py-3 md:min-w-[200px]">
+													<Textarea
+														rows={3}
+														value={e.participatoryMethodologies || ""}
+														onChange={(ev) =>
+															updateEntry(
+																e.id,
+																"participatoryMethodologies",
+																ev.target.value
+															)
+														}
+														placeholder="Methodologies..."
+													/>
+												</td>
+												<td className="px-4 py-3 md:min-w-[200px]">
+													<Textarea
+														rows={3}
+														value={e.modificationToSyllabus || ""}
+														onChange={(ev) =>
+															updateEntry(
+																e.id,
+																"modificationToSyllabus",
+																ev.target.value
+															)
+														}
+														placeholder="Modifications..."
+													/>
+												</td>
+												<td className="px-4 py-3 md:min-w-[200px]">
+													<Textarea
+														rows={3}
+														value={e.coverageBeyondSyllabus || ""}
+														onChange={(ev) =>
+															updateEntry(
+																e.id,
+																"coverageBeyondSyllabus",
+																ev.target.value
+															)
+														}
+														placeholder="Beyond syllabus..."
 													/>
 												</td>
 												<td className="px-2 py-3 text-right">

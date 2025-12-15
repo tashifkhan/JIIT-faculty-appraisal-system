@@ -1,16 +1,23 @@
 import logging
 from datetime import datetime
-from typing import List,Tuple,Dict
+from typing import List, Tuple, Dict
 
 logger = logging.getLogger(__name__)
 
-def calculate_api_score_for_item11(status:str, program_type:str, is_chief_organizer:bool, start_date:str, end_date:str):
+
+def calculate_api_score_for_item11(
+    status: str,
+    program_type: str,
+    is_chief_organizer: bool,
+    start_date: str,
+    end_date: str,
+):
     """
     Calculate the total API score for a list of events based on:
-    - "attended"/"organized" (status), 
-    - is_chief_organizer, 
-    - program type (course/program vs seminar/conference/workshop), 
-    - duration (in days or weeks), 
+    - "attended"/"organized" (status),
+    - is_chief_organizer,
+    - program type (course/program vs seminar/conference/workshop),
+    - duration (in days or weeks),
     and assigns API points as per the specification.
     """
 
@@ -26,7 +33,7 @@ def calculate_api_score_for_item11(status:str, program_type:str, is_chief_organi
         try:
             start_date = datetime.strptime(start_date, "%d-%m-%Y")
             end_date = datetime.strptime(end_date, "%d-%m-%Y")
-            duration_days = (end_date - start_date).days + 1 # Inclusive
+            duration_days = (end_date - start_date).days + 1  # Inclusive
         except Exception as e:
             logger.error(f"Error parsing dates: {e}")
             duration_days = None
@@ -72,7 +79,8 @@ def calculate_api_score_for_item11(status:str, program_type:str, is_chief_organi
                 if is_chief_organizer:
                     api_points += 5
 
-    return api_points,seminar_attended
+    return api_points, seminar_attended
+
 
 def calculate_api_score_for_item12_1(data: List[Dict]):
     """
@@ -80,7 +88,7 @@ def calculate_api_score_for_item12_1(data: List[Dict]):
 
     Args:
         data (List[Dict]): List of classes with their scheduled and engaged hours.
-                           Each dict should have "course_code", "course_title", 
+                           Each dict should have "course_code", "course_title",
                            "contact_hr_per_week", "total_hour_scheduled", "total_hour_engaged".
 
     Returns:
@@ -94,7 +102,7 @@ def calculate_api_score_for_item12_1(data: List[Dict]):
         engaged = item.get("total_hour_engaged", 0) or 0
         total_scheduled += scheduled
         total_engaged += engaged
-    
+
     percent = (total_engaged / total_scheduled * 100) if total_scheduled > 0 else 0
 
     if percent >= 95:
@@ -111,6 +119,44 @@ def calculate_api_score_for_item12_1(data: List[Dict]):
     total_api_score = min(score_25 + score_5, 30)
 
     return total_api_score
+
+
+def calculate_api_score_for_item12_2(data: List[Dict]):
+    """
+    Calculates the API score for item 12.2 based on reading material resources.
+
+    Item 12.2 Rules:
+    - API score out of 10 be allotted for each of the sub-components.
+    - Maximum total API score for this component (12.2) will be limited to 35.
+
+    Args:
+        data (List[Dict]): List of reading material entries.
+
+    Returns:
+        Tuple[int, List[int]]: Total API score (max 35), and score per item.
+    """
+    total_score = 0
+    api_score_list = []
+
+    for item in data:
+        # Assigning 10 points per valid entry as a baseline for "sub-components"
+        # since specific sub-component breakdown isn't granular in the list item itself
+        # This aligns with the "10 points per sub-component" rule of thumb used here.
+        score = 0
+        if item.get("course_code") and (
+            item.get("consulted") or item.get("prescribed") or item.get("additional")
+        ):
+            score = 10
+
+        # Check for other specific sub-components if they exist as separate entries or flags
+        # For now, we assume each entry represents a course with resources contributing to the score.
+
+        api_score_list.append(score)
+        total_score += score
+
+    total_score = min(total_score, 35)
+    return total_score, api_score_list
+
 
 def calculate_api_score_for_item13(data: List[Dict], section: str) -> int:
     """
@@ -154,12 +200,17 @@ def calculate_api_score_for_item13(data: List[Dict], section: str) -> int:
             pos = str(item.get("position_type", "")).lower()
             # Positions eligible for 10 pts
             lead_positions = [
-                "director", "dean", "hod", "time table incharge", "incharge training & placement",
-                "chairman of institution level committee", "other similar level position"
+                "director",
+                "dean",
+                "hod",
+                "time table incharge",
+                "incharge training & placement",
+                "chairman of institution level committee",
+                "other similar level position",
             ]
             if any(lp in pos for lp in lead_positions):
                 score = 10
-            elif pos in ["member","individual responsibility"]:
+            elif pos in ["member", "individual responsibility"]:
                 score = 5
             else:
                 score = 0
@@ -172,7 +223,7 @@ def calculate_api_score_for_item13(data: List[Dict], section: str) -> int:
             typ = str(item.get("nature", "")).lower()
             if typ == "outside":
                 score = 10
-            elif typ =="within":
+            elif typ == "within":
                 score = 5
             else:
                 score = 0
@@ -181,7 +232,7 @@ def calculate_api_score_for_item13(data: List[Dict], section: str) -> int:
 
     elif section == "E":
         for item in data:
-            score = min(int(item.get("points",0)),3)
+            score = min(int(item.get("points", 0)), 3)
             total_score += score
         total_score = min(total_score, 10)
 
@@ -189,6 +240,7 @@ def calculate_api_score_for_item13(data: List[Dict], section: str) -> int:
         raise ValueError(f"Unknown section: {section}")
 
     return total_score
+
 
 def calculate_api_score_for_item14(publication: Dict):
     """
@@ -253,7 +305,7 @@ def calculate_api_score_for_item14(publication: Dict):
             base_score += 10
 
     # Joint Publication - point distribution logic
-    if publication.get("other_authors",[]):
+    if publication.get("other_authors", []):
         user_author_type = str(publication.get("user_author_type", "")).lower()
 
         all_authors_type = [user_author_type]
@@ -267,7 +319,7 @@ def calculate_api_score_for_item14(publication: Dict):
             # 60% category
             if typ in [
                 "first/principal author",
-                "corresponding author/supervisor/mentor"
+                "corresponding author/supervisor/mentor",
             ]:
                 return "lead"
             else:
@@ -290,11 +342,11 @@ def calculate_api_score_for_item14(publication: Dict):
         other_share = 0.4
 
         # Calculate share points for each
-        lead_point = (base_score * lead_share / n_lead)
-        other_point = (base_score * other_share / n_other)
+        lead_point = base_score * lead_share / n_lead
+        other_point = base_score * other_share / n_other
 
         if lead_point < other_point:
-            score = base_score/n_total
+            score = base_score / n_total
         else:
             if _author_category(user_author_type) == "lead":
                 score = lead_point
@@ -302,6 +354,7 @@ def calculate_api_score_for_item14(publication: Dict):
                 score = other_point
 
         return score
+
 
 def calculate_api_score_for_item15(publication: Dict):
     """
@@ -342,7 +395,7 @@ def calculate_api_score_for_item15(publication: Dict):
         base_score = 0
 
     if is_chapter:
-        base_score = number_of_chapters * (0.2*base_score)  # 20% for a chapter
+        base_score = number_of_chapters * (0.2 * base_score)  # 20% for a chapter
 
     # Author determination
     user_author_type = str(publication.get("user_author_type", "")).lower()
@@ -364,14 +417,15 @@ def calculate_api_score_for_item15(publication: Dict):
 
     if user_author_type == "first/principal author":
         if n_authors_total == 2:
-            return (base_score*0.6)
+            return base_score * 0.6
         else:
-            return (base_score*0.4)/(lead+1)
+            return (base_score * 0.4) / (lead + 1)
     else:
         if n_authors_total == 2:
-            return (base_score*0.4)
+            return base_score * 0.4
         else:
-            return (base_score*0.6)/(other+1)
+            return (base_score * 0.6) / (other + 1)
+
 
 def calculate_api_score_for_item16(project: Dict):
     """
@@ -437,14 +491,15 @@ def calculate_api_score_for_item16(project: Dict):
 
     if user_author_type == "first/principal author":
         if n_authors_total == 2:
-            return (api_points*0.6)
+            return api_points * 0.6
         else:
-            return (api_points*0.4)/(lead+1)
+            return (api_points * 0.4) / (lead + 1)
     else:
         if n_authors_total == 2:
-            return (api_points*0.4)
+            return api_points * 0.4
         else:
-            return (api_points*0.6)/(other+1)
+            return (api_points * 0.6) / (other + 1)
+
 
 def calculate_api_score_for_item17(project: Dict):
     """
@@ -497,11 +552,11 @@ def calculate_api_score_for_item17(project: Dict):
 
     if user_author_type == "chief supervisor":
         if n_authors_total == 2:
-            return (api_points*0.6)
+            return api_points * 0.6
         else:
-            return (api_points*0.4)/(lead+1)
+            return (api_points * 0.4) / (lead + 1)
     else:
         if n_authors_total == 2:
-            return (api_points*0.4)
+            return api_points * 0.4
         else:
-            return (api_points*0.6)/(other+1)
+            return (api_points * 0.6) / (other + 1)

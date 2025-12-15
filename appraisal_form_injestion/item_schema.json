@@ -90,6 +90,39 @@ item3_get_schema = {
     }
 }
 
+item4_post_schema = [
+    {
+        "course_code": str,
+        "consulted": str,
+        "prescribed": str,
+        "additional": str,
+        "participatory_methodologies": str,
+        "modification_to_syllabus": str,
+        "coverage_beyond_syllabus": str
+    },
+    ...
+]
+
+item4_get_schema = {
+    "user_id": str,
+    "12.2": {
+        "data": [
+            {
+                "course_code": str,
+                "consulted": str,
+                "prescribed": str,
+                "additional": str,
+                "participatory_methodologies": str,
+                "modification_to_syllabus": str,
+                "coverage_beyond_syllabus": str
+            },
+            ...
+        ],
+        "score": int,
+        "api_score_list": [int, ...]
+    }
+}
+
 item5_post_schema = {
     "12.3": {
         "number_of_projects_guided": int,

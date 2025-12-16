@@ -529,3 +529,27 @@ class InjestItem19(APIView):
                 {"message": "Error injesting data for item 19"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class GetAllFacultyData(APIView):
+    """
+    API Endpoint to get all faculty appraisal data for HOD dashboard
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data_injestion_service = DataInjestionService()
+
+    def get(self, request, *args, **kwargs):
+        try:
+            result = self.data_injestion_service.get_all_faculty_data()
+            return Response(
+                {"message": "Data fetched successfully", "result": result},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            logger.error(f"Error fetching all faculty data: {e}")
+            return Response(
+                {"message": "Error fetching faculty data"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

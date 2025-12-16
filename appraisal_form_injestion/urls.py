@@ -13,6 +13,7 @@ from .views import (
     InjestItem17,
     InjestItem18,
     InjestItem19,
+    GetAllFacultyData,
 )
 
 urlpatterns = [
@@ -35,4 +36,9 @@ urlpatterns = [
     path("injest-item-17/", InjestItem17.as_view(), name="injest-item-17"),
     path("injest-item-18/", InjestItem18.as_view(), name="injest-item-18"),
     path("injest-item-19/", InjestItem19.as_view(), name="injest-item-19"),
+    path(
+        "get-all-faculty-data/",
+        GetAllFacultyData.as_view(),
+        name="get-all-faculty-data",
+    ),
 ]

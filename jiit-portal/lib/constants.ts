@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
   INJEST_ITEM_17: `${API_BASE_URL}/api/injest-item-17/`,
   INJEST_ITEM_18: `${API_BASE_URL}/api/injest-item-18/`,
   INJEST_ITEM_19: `${API_BASE_URL}/api/injest-item-19/`,
+  GET_ALL_FACULTY_DATA: `${API_BASE_URL}/api/get-all-faculty-data/`,
 } as const;
 
 export const APPRAISAL_SECTIONS = [

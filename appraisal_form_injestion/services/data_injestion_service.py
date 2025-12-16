@@ -296,3 +296,16 @@ class DataInjestionService:
         except Exception as e:
             logger.error(f"Error injesting data 19: {e}")
             raise e
+
+    def get_all_faculty_data(self):
+        try:
+            # Fetch all user data
+            all_data = (
+                self.data_injestion_mongo_client.get_all_data_injestion_collections()
+            )
+
+            # Format/Process if needed, currently returning raw list
+            return all_data
+        except Exception as e:
+            logger.error(f"Error fetching all faculty data: {e}")
+            raise e

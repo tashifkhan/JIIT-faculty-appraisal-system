@@ -1,37 +1,68 @@
 import logging
-from typing import List,Dict
+from typing import List, Dict
 from common.clients.abstract_mongo_client import AbstractMongoDBClient
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
 class DataInjestionMongoClient(AbstractMongoDBClient):
     def __init__(self):
         super().__init__(settings.APPRAISAL_SYSTEM_MONGO_DB_NAME)
 
-    def get_data_injestion_collection(self, user_id:str, projection:Dict = None):
+    def get_data_injestion_collection(self, user_id: str, projection: Dict = None):
         try:
             projection["_id"] = 0
-            result = self.find_one(settings.DATA_INJECTION_COLLECTION_NAME, {"user_id": user_id}, projection)
+            result = self.find_one(
+                settings.DATA_INJECTION_COLLECTION_NAME,
+                {"user_id": user_id},
+                projection,
+            )
             return result
         except Exception as e:
             logger.error(f"Error getting data injestion collection: {e}")
             raise e
 
-    def update_data_injestion_collection(self, user_id:str, data):
+    def update_data_injestion_collection(self, user_id: str, data):
         try:
             filter_dict = {"user_id": user_id}
             update = {"$set": data}
-            self.update_one(settings.DATA_INJECTION_COLLECTION_NAME, filter_dict, update)
+            self.update_one(
+                settings.DATA_INJECTION_COLLECTION_NAME, filter_dict, update
+            )
         except Exception as e:
             logger.error(f"Error updating data injestion collection: {e}")
             raise e
 
-    def get_data_injestion_collection_by_user_id_and_section(self, user_id:str, section:str):
+    def get_data_injestion_collection_by_user_id_and_section(
+        self, user_id: str, section: str
+    ):
         try:
-            projection = {"_id": 0, "user_id":1, f"{section}":1}
-            result = self.find_one(settings.DATA_INJECTION_COLLECTION_NAME, {"user_id": user_id}, projection)
+            projection = {"_id": 0, "user_id": 1, f"{section}": 1}
+            result = self.find_one(
+                settings.DATA_INJECTION_COLLECTION_NAME,
+                {"user_id": user_id},
+                projection,
+            )
             return result
         except Exception as e:
-            logger.error(f"Error getting data injestion collection by user id and section: {e}")
+            logger.error(
+                f"Error getting data injestion collection by user id and section: {e}"
+            )
+            raise e
+
+    def get_all_data_injestion_collections(self, projection: Dict = None):
+        try:
+            if projection:
+                projection["_id"] = 0
+            else:
+                projection = {"_id": 0}
+
+            # Fetch all documents
+            cursor = self.find_all(
+                settings.DATA_INJECTION_COLLECTION_NAME, {}, projection=projection
+            )
+            return list(cursor)
+        except Exception as e:
+            logger.error(f"Error getting all data injestion collections: {e}")
             raise e

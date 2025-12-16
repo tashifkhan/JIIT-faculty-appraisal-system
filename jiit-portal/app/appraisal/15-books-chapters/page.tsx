@@ -31,6 +31,7 @@ import { simulateApiCall } from "@/lib/mockApi";
 import { ArrowLeft, ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import { FileUpload } from "@/components/FileUpload";
 
 export default function BooksChaptersPage() {
 	const router = useRouter();
@@ -45,6 +46,7 @@ export default function BooksChaptersPage() {
 			numberOfChapters: 0,
 			userAuthorType: "",
 			otherAuthors: [],
+			proofFiles: [],
 		},
 	]);
 
@@ -74,6 +76,7 @@ export default function BooksChaptersPage() {
 							name: author.name || "",
 							authorType: author.authorType || "",
 						})),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -91,6 +94,7 @@ export default function BooksChaptersPage() {
 				numberOfChapters: 0,
 				userAuthorType: "",
 				otherAuthors: [],
+				proofFiles: [],
 			},
 		]);
 	};
@@ -160,6 +164,14 @@ export default function BooksChaptersPage() {
 							),
 					  }
 					: e
+			)
+		);
+	};
+
+	const handleFileSelect = (id: string, base64: string | null) => {
+		setEntries((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
 			)
 		);
 	};
@@ -319,6 +331,16 @@ export default function BooksChaptersPage() {
 												</SelectContent>
 											</Select>
 										</div>
+									</div>
+
+									<div className="space-y-2 border-t pt-4">
+										<Label>Evidence of Book/Chapter</Label>
+										<FileUpload
+											onFileSelect={(base64) =>
+												handleFileSelect(entry.id, base64)
+											}
+											currentFile={entry.proofFiles?.[0]}
+										/>
 									</div>
 
 									{/* Other Authors Section */}

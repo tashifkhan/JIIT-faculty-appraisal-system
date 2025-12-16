@@ -18,20 +18,21 @@ import { getSectionData, updateSectionData } from "@/lib/localStorage";
 import { simulateApiCall } from "@/lib/mockApi";
 import { ArrowLeft, ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { FileUpload } from "@/components/FileUpload";
 
 export default function OtherInfoPage() {
 	const router = useRouter();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [apiScore, setApiScore] = useState<number | null>(null);
 	const [selfEntries, setSelfEntries] = useState<OtherInfoEntry[]>([
-		{ id: crypto.randomUUID(), details: "", points: 0 },
+		{ id: crypto.randomUUID(), details: "", points: 0, proofFiles: [] },
 	]);
 	const [nationalEntries, setNationalEntries] = useState<
 		Omit<OtherInfoEntry, "points">[]
-	>([{ id: crypto.randomUUID(), details: "" }]);
+	>([{ id: crypto.randomUUID(), details: "", proofFiles: [] }]);
 	const [internationalEntries, setInternationalEntries] = useState<
 		Omit<OtherInfoEntry, "points">[]
-	>([{ id: crypto.randomUUID(), details: "" }]);
+	>([{ id: crypto.randomUUID(), details: "", proofFiles: [] }]);
 
 	const currentIndex = APPRAISAL_SECTIONS.findIndex(
 		(s) => s.id === "19-other-info"
@@ -50,6 +51,7 @@ export default function OtherInfoPage() {
 					existing.self.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -58,6 +60,7 @@ export default function OtherInfoPage() {
 					existing.national.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -66,6 +69,7 @@ export default function OtherInfoPage() {
 					existing.international.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -76,7 +80,7 @@ export default function OtherInfoPage() {
 	const addSelfEntry = () =>
 		setSelfEntries((list) => [
 			...list,
-			{ id: crypto.randomUUID(), details: "", points: 0 },
+			{ id: crypto.randomUUID(), details: "", points: 0, proofFiles: [] },
 		]);
 	const removeSelfEntry = (id: string) =>
 		setSelfEntries((list) =>
@@ -95,7 +99,7 @@ export default function OtherInfoPage() {
 	const addNationalEntry = () =>
 		setNationalEntries((list) => [
 			...list,
-			{ id: crypto.randomUUID(), details: "" },
+			{ id: crypto.randomUUID(), details: "", proofFiles: [] },
 		]);
 	const removeNationalEntry = (id: string) =>
 		setNationalEntries((list) =>
@@ -110,7 +114,7 @@ export default function OtherInfoPage() {
 	const addInternationalEntry = () =>
 		setInternationalEntries((list) => [
 			...list,
-			{ id: crypto.randomUUID(), details: "" },
+			{ id: crypto.randomUUID(), details: "", proofFiles: [] },
 		]);
 	const removeInternationalEntry = (id: string) =>
 		setInternationalEntries((list) =>
@@ -120,6 +124,30 @@ export default function OtherInfoPage() {
 		setInternationalEntries((list) =>
 			list.map((e) => (e.id === id ? { ...e, details: value } : e))
 		);
+
+	const handleSelfFileSelect = (id: string, base64: string | null) => {
+		setSelfEntries((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+
+	const handleNationalFileSelect = (id: string, base64: string | null) => {
+		setNationalEntries((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+
+	const handleInternationalFileSelect = (id: string, base64: string | null) => {
+		setInternationalEntries((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
 
 	const payload: OtherInfoSection = useMemo(
 		() => ({
@@ -194,7 +222,8 @@ export default function OtherInfoPage() {
 								<table className="w-full text-sm">
 									<thead className="bg-muted/50 text-muted-foreground">
 										<tr>
-											<th className="px-4 py-3 text-left w-[70%]">Details</th>
+											<th className="px-4 py-3 text-left w-[40%]">Details</th>
+											<th className="px-4 py-3 text-left w-[20%]">Proof</th>
 											<th className="px-4 py-3 w-[10%]"></th>
 										</tr>
 									</thead>
@@ -210,6 +239,16 @@ export default function OtherInfoPage() {
 														placeholder="Describe the activity, achievement, or contribution..."
 														rows={2}
 													/>
+												</td>
+												<td className="p-3">
+													<div className="w-full min-w-[200px]">
+														<FileUpload
+															onFileSelect={(base64) =>
+																handleSelfFileSelect(e.id, base64)
+															}
+															currentFile={e.proofFiles?.[0]}
+														/>
+													</div>
 												</td>
 												<td className="p-3 text-right">
 													<Button
@@ -255,7 +294,8 @@ export default function OtherInfoPage() {
 								<table className="w-full text-sm">
 									<thead className="bg-muted/50 text-muted-foreground">
 										<tr>
-											<th className="px-4 py-3 text-left w-[90%]">Details</th>
+											<th className="px-4 py-3 text-left w-[60%]">Details</th>
+											<th className="px-4 py-3 text-left w-[20%]">Proof</th>
 											<th className="px-4 py-3 w-[10%]"></th>
 										</tr>
 									</thead>
@@ -271,6 +311,16 @@ export default function OtherInfoPage() {
 														placeholder="e.g., National Patent: Device for..., Technology Transfer to..."
 														rows={2}
 													/>
+												</td>
+												<td className="p-3">
+													<div className="w-full min-w-[200px]">
+														<FileUpload
+															onFileSelect={(base64) =>
+																handleNationalFileSelect(e.id, base64)
+															}
+															currentFile={e.proofFiles?.[0]}
+														/>
+													</div>
 												</td>
 												<td className="p-3 text-right">
 													<Button
@@ -316,7 +366,8 @@ export default function OtherInfoPage() {
 								<table className="w-full text-sm">
 									<thead className="bg-muted/50 text-muted-foreground">
 										<tr>
-											<th className="px-4 py-3 text-left w-[90%]">Details</th>
+											<th className="px-4 py-3 text-left w-[60%]">Details</th>
+											<th className="px-4 py-3 text-left w-[20%]">Proof</th>
 											<th className="px-4 py-3 w-[10%]"></th>
 										</tr>
 									</thead>
@@ -332,6 +383,16 @@ export default function OtherInfoPage() {
 														placeholder="e.g., International Patent (USPTO): System for..., Global Technology Transfer..."
 														rows={2}
 													/>
+												</td>
+												<td className="p-3">
+													<div className="w-full min-w-[200px]">
+														<FileUpload
+															onFileSelect={(base64) =>
+																handleInternationalFileSelect(e.id, base64)
+															}
+															currentFile={e.proofFiles?.[0]}
+														/>
+													</div>
 												</td>
 												<td className="p-3 text-right">
 													<Button

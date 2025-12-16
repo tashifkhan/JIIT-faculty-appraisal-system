@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   INJEST_ITEM_1_TO_10: `${API_BASE_URL}/api/injest-item-1-to-10/`,
   INJEST_ITEM_11: `${API_BASE_URL}/api/injest-item-11/`,
   INJEST_ITEM_12_1: `${API_BASE_URL}/api/injest-item-12-1/`,
+  INJEST_ITEM_12_2: `${API_BASE_URL}/api/injest-item-12-2/`,
   INJEST_ITEM_12_3_TO_12_4: `${API_BASE_URL}/api/injest-item-12-3-to-12-4/`,
   INJEST_ITEM_13: `${API_BASE_URL}/api/injest-item-13/`,
   INJEST_ITEM_14: `${API_BASE_URL}/api/injest-item-14/`,
@@ -14,6 +15,7 @@ export const API_ENDPOINTS = {
   INJEST_ITEM_17: `${API_BASE_URL}/api/injest-item-17/`,
   INJEST_ITEM_18: `${API_BASE_URL}/api/injest-item-18/`,
   INJEST_ITEM_19: `${API_BASE_URL}/api/injest-item-19/`,
+  GET_ALL_FACULTY_DATA: `${API_BASE_URL}/api/get-all-faculty-data/`,
 } as const;
 
 export const APPRAISAL_SECTIONS = [

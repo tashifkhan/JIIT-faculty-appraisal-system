@@ -25,13 +25,19 @@ import { getSectionData, updateSectionData } from "@/lib/localStorage";
 import { simulateApiCall } from "@/lib/mockApi";
 import { ArrowLeft, ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { FileUpload } from "@/components/FileUpload";
 
 export default function MembershipsPage() {
 	const router = useRouter();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [apiScore, setApiScore] = useState<number | null>(null);
 	const [entries, setEntries] = useState<MembershipEntry[]>([
-		{ id: crypto.randomUUID(), positionType: "", membershipDetails: "" },
+		{
+			id: crypto.randomUUID(),
+			positionType: "",
+			membershipDetails: "",
+			proofFiles: [],
+		},
 	]);
 
 	const currentIndex = APPRAISAL_SECTIONS.findIndex(
@@ -51,6 +57,7 @@ export default function MembershipsPage() {
 					existing.entries.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -60,7 +67,12 @@ export default function MembershipsPage() {
 	const addEntry = () =>
 		setEntries((list) => [
 			...list,
-			{ id: crypto.randomUUID(), positionType: "", membershipDetails: "" },
+			{
+				id: crypto.randomUUID(),
+				positionType: "",
+				membershipDetails: "",
+				proofFiles: [],
+			},
 		]);
 	const removeEntry = (id: string) =>
 		setEntries((list) =>
@@ -74,6 +86,14 @@ export default function MembershipsPage() {
 		setEntries((list) =>
 			list.map((e) => (e.id === id ? { ...e, [key]: value } : e))
 		);
+
+	const handleFileSelect = (id: string, base64: string | null) => {
+		setEntries((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
 
 	const payload: MembershipsSection = useMemo(
 		() => ({ entries, apiScore: null }),
@@ -123,9 +143,10 @@ export default function MembershipsPage() {
 										<th className="px-4 py-3 text-left w-[30%]">
 											Position Type
 										</th>
-										<th className="px-4 py-3 text-left w-[60%]">
+										<th className="px-4 py-3 text-left w-[50%]">
 											Membership Details
 										</th>
+										<th className="px-4 py-3 text-left w-[20%]">Proof</th>
 										<th className="px-4 py-3 w-[10%]"></th>
 									</tr>
 								</thead>
@@ -172,6 +193,16 @@ export default function MembershipsPage() {
 													}
 													placeholder="e.g., IEEE - Institute of Electrical and Electronics Engineers"
 												/>
+											</td>
+											<td className="p-3">
+												<div className="w-full min-w-[200px]">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelect(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
+													/>
+												</div>
 											</td>
 											<td className="p-3 text-right">
 												<Button

@@ -219,3 +219,11 @@ export function getBackendSectionKey(frontendSectionId: string): string {
   }
   return backendKey;
 }
+
+/**
+ * Get all faculty appraisal data for HOD dashboard
+ */
+export async function getAllFacultyData(): Promise<any> {
+    const result = await apiGet(API_ENDPOINTS.GET_ALL_FACULTY_DATA);
+    return result;
+}

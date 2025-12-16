@@ -122,6 +122,7 @@ function transformConferenceToBackend(entries: ConferenceEntry[]) {
       is_chief_organizer: entry.isChiefOrganiser === 'yes',
       sponsoring_agency: entry.sponsoringAgency,
       'organisation_&_place': entry.organisationPlace,
+      proof_files: entry.proofFiles,
     };
   });
 }
@@ -225,12 +226,49 @@ export const calculateLecturesScore = async (
 };
 
 // ==================== Item 12.2: Reading Material ====================
-// Note: Backend doesn't have a specific endpoint for item 12.2 yet
-// Using mock calculation for now
 
-export const calculateReadingMaterialScore = (entries: ReadingMaterialEntry[]): number => {
-  // Mock: sum of self-assessed API scores, capped per entry at 5
-  return entries.reduce((total, e) => total + Math.min(Math.max(Number(e.selfAssessedApi) || 0, 0), 5), 0);
+/**
+ * Transform frontend ReadingMaterialEntry to backend schema (item4_post_schema)
+ */
+function transformReadingMaterialToBackend(entries: ReadingMaterialEntry[]) {
+  return entries.map((entry) => ({
+    course_code: entry.courseCode,
+    consulted: entry.consulted,
+    prescribed: entry.prescribed,
+    additional: entry.additional,
+    participatory_methodologies: entry.participatoryMethodologies || "",
+    modification_to_syllabus: entry.modificationToSyllabus || "",
+    coverage_beyond_syllabus: entry.coverageBeyondSyllabus || "",
+    proof_files: entry.proofFiles,
+  }));
+}
+
+export const calculateReadingMaterialScore = async (
+  entries: ReadingMaterialEntry[],
+  userId?: string
+): Promise<{ score: number; message: string }> => {
+  const user_id = userId || getUserId();
+  const data = transformReadingMaterialToBackend(entries);
+  
+  const payload = {
+    user_id,
+    data,
+  };
+
+  const response = await apiFetch<ApiResponse>(
+    API_ENDPOINTS.INJEST_ITEM_12_2,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const score = response.result?.score || 0;
+  
+  return {
+    score,
+    message: response.message || 'Section submitted successfully',
+  };
 };
 
 // ==================== Item 12.3-12.4: Project Guidance & Exam Duties ====================
@@ -314,22 +352,27 @@ function transformStudentActivitiesToBackend(data: StudentActivitiesSection) {
       name_of_club: item.nameOfClub,
       played_lead_role: item.playedLeadRole,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     B: data.B.map((item) => ({
       role: item.role,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     C: data.C.map((item) => ({
       position_type: item.positionType,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     D: data.D.map((item) => ({
       nature: item.nature,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     E: data.E.map((item) => ({
       points: item.points,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
   };
 }
@@ -379,6 +422,7 @@ function transformResearchPapersToBackend(entries: ResearchPaperEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -426,6 +470,7 @@ function transformBooksChaptersToBackend(entries: BookChapterEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -477,6 +522,7 @@ function transformResearchProjectsToBackend(entries: ResearchProjectEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -525,6 +571,7 @@ function transformResearchGuidanceToBackend(entries: ResearchGuidanceEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -565,6 +612,7 @@ function transformMembershipsToBackend(entries: MembershipEntry[]) {
   return entries.map((entry) => ({
     position_type: entry.positionType,
     membership_details: entry.membershipDetails,
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -606,12 +654,15 @@ function transformOtherInfoToBackend(data: OtherInfoSection) {
     self: data.self.map((item) => ({
       details: item.details,
       points: item.points,
+      proof_files: item.proofFiles,
     })),
     national: data.national.map((item) => ({
       details: item.details,
+      proof_files: item.proofFiles,
     })),
     international: data.international.map((item) => ({
       details: item.details,
+      proof_files: item.proofFiles,
     })),
   };
 }
@@ -696,14 +747,9 @@ export const simulateApiCall = async <T extends SectionId>(
         );
       
       case '12-2-reading-material': {
-        // Using mock for now since backend doesn't have this endpoint
-        const score = calculateReadingMaterialScore(
+        return await calculateReadingMaterialScore(
           (data as ReadingMaterialSection | { entries: ReadingMaterialEntry[] }).entries || []
         );
-        return {
-          score,
-          message: `Section submitted successfully. API Score: ${score}`,
-        };
       }
       
       case '12-3-4-project-guidance-and-exam-duties': {

@@ -13,6 +13,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { FileUpload } from "@/components/FileUpload";
 
 import { APPRAISAL_SECTIONS } from "@/lib/constants";
 import { ReadingMaterialEntry, ReadingMaterialSection } from "@/lib/types";
@@ -34,8 +35,12 @@ export default function ReadingMaterialPage() {
 			consulted: "",
 			prescribed: "",
 			additional: "",
+			participatoryMethodologies: "",
+			modificationToSyllabus: "",
+			coverageBeyondSyllabus: "",
 			selfAssessedApi: 0,
 			hodRemarks: "Pending",
+			proofFiles: [],
 		},
 	]);
 
@@ -57,6 +62,7 @@ export default function ReadingMaterialPage() {
 						...e,
 						id: e.id || crypto.randomUUID(),
 						hodRemarks: e.hodRemarks ?? "Approved",
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -72,8 +78,12 @@ export default function ReadingMaterialPage() {
 				consulted: "",
 				prescribed: "",
 				additional: "",
+				participatoryMethodologies: "",
+				modificationToSyllabus: "",
+				coverageBeyondSyllabus: "",
 				selfAssessedApi: 0,
 				hodRemarks: "Pending",
+				proofFiles: [],
 			},
 		]);
 	};
@@ -91,6 +101,18 @@ export default function ReadingMaterialPage() {
 	) => {
 		setEntries((list) =>
 			list.map((e) => (e.id === id ? { ...e, [key]: value } : e))
+		);
+	};
+
+	const handleFileSelect = (id: string, base64: string | null) => {
+		setEntries((list) =>
+			list.map((e) => {
+				if (e.id === id) {
+					const newFiles = base64 ? [base64] : [];
+					return { ...e, proofFiles: newFiles };
+				}
+				return e;
+			})
 		);
 	};
 
@@ -166,6 +188,52 @@ export default function ReadingMaterialPage() {
 											}
 											placeholder="Additional Resources Provided"
 										/>
+										<Textarea
+											rows={2}
+											value={e.participatoryMethodologies || ""}
+											onChange={(ev) =>
+												updateEntry(
+													e.id,
+													"participatoryMethodologies",
+													ev.target.value
+												)
+											}
+											placeholder="Participatory Methodologies"
+										/>
+										<Textarea
+											rows={2}
+											value={e.modificationToSyllabus || ""}
+											onChange={(ev) =>
+												updateEntry(
+													e.id,
+													"modificationToSyllabus",
+													ev.target.value
+												)
+											}
+											placeholder="Modification to Syllabus"
+										/>
+										<Textarea
+											rows={2}
+											value={e.coverageBeyondSyllabus || ""}
+											onChange={(ev) =>
+												updateEntry(
+													e.id,
+													"coverageBeyondSyllabus",
+													ev.target.value
+												)
+											}
+											placeholder="Coverage Beyond Syllabus"
+										/>
+
+										<div className="py-2">
+											<FileUpload
+												onFileSelect={(base64) =>
+													handleFileSelect(e.id, base64)
+												}
+												currentFile={e.proofFiles?.[0]}
+											/>
+										</div>
+
 										<div className="flex justify-end">
 											<Button
 												variant="ghost"
@@ -202,6 +270,16 @@ export default function ReadingMaterialPage() {
 											<th className="px-4 py-3 text-left">
 												Additional Resources Provided
 											</th>
+											<th className="px-4 py-3 text-left">
+												Participatory Methodologies
+											</th>
+											<th className="px-4 py-3 text-left">
+												Modification to Syllabus
+											</th>
+											<th className="px-4 py-3 text-left">
+												Coverage Beyond Syllabus
+											</th>
+											<th className="px-4 py-3 text-left">Proof</th>
 											<th className="px-4 py-3"></th>
 										</tr>
 									</thead>
@@ -245,6 +323,56 @@ export default function ReadingMaterialPage() {
 															updateEntry(e.id, "additional", ev.target.value)
 														}
 														placeholder="Lecture notes, examples, links..."
+													/>
+												</td>
+												<td className="px-4 py-3 md:min-w-[200px]">
+													<Textarea
+														rows={3}
+														value={e.participatoryMethodologies || ""}
+														onChange={(ev) =>
+															updateEntry(
+																e.id,
+																"participatoryMethodologies",
+																ev.target.value
+															)
+														}
+														placeholder="Methodologies..."
+													/>
+												</td>
+												<td className="px-4 py-3 md:min-w-[200px]">
+													<Textarea
+														rows={3}
+														value={e.modificationToSyllabus || ""}
+														onChange={(ev) =>
+															updateEntry(
+																e.id,
+																"modificationToSyllabus",
+																ev.target.value
+															)
+														}
+														placeholder="Modifications..."
+													/>
+												</td>
+												<td className="px-4 py-3 md:min-w-[200px]">
+													<Textarea
+														rows={3}
+														value={e.coverageBeyondSyllabus || ""}
+														onChange={(ev) =>
+															updateEntry(
+																e.id,
+																"coverageBeyondSyllabus",
+																ev.target.value
+															)
+														}
+														placeholder="Beyond syllabus..."
+													/>
+												</td>
+												<td className="px-4 py-3 min-w-[150px]">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelect(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
 													/>
 												</td>
 												<td className="px-2 py-3 text-right">

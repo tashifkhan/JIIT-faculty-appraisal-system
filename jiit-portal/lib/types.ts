@@ -30,6 +30,7 @@ export interface ConferenceEntry {
 	attendedOrganized: "attended" | "organized";
 	isChiefOrganiser?: "yes" | "no";
 	programType: "course" | "program" | "seminar" | "conference" | "workshop";
+	proofFiles?: string[];
 }
 
 export interface ConferenceSection {
@@ -65,6 +66,7 @@ export interface ReadingMaterialEntry {
 	coverageBeyondSyllabus?: string; // Any Coverage/ Introduction beyond syllabus
 	selfAssessedApi: number; // Self assessed API score per course
 	hodRemarks?: string; // Approved/Pending/Rejected
+	proofFiles?: string[]; // Base64 strings for proof documents
 }
 
 export interface ReadingMaterialSection extends ScoredItem {
@@ -115,6 +117,7 @@ export interface BookChapterEntry {
 	numberOfChapters: number;
 	userAuthorType: string;
 	otherAuthors: BookChapterAuthor[];
+	proofFiles?: string[];
 }
 
 export interface BooksChaptersSection extends ScoredItem {
@@ -146,6 +149,7 @@ export interface ResearchPaperEntry {
 	impactFactor: number;
 	userAuthorType: string;
 	otherAuthors: OtherAuthor[];
+	proofFiles?: string[];
 }
 
 export interface ResearchPapersSection {
@@ -202,6 +206,7 @@ export interface ResearchProjectEntry {
 	isConsultancy: boolean;
 	userAuthorType: string;
 	otherAuthors: ResearchProjectAuthor[];
+	proofFiles?: string[];
 }
 
 export interface ResearchProjectsSection extends ScoredItem {
@@ -227,6 +232,7 @@ export interface ResearchGuidanceEntry {
 	monthsOngoing: number;
 	userAuthorType: string;
 	otherAuthors: ResearchGuidanceAuthor[];
+	proofFiles?: string[];
 }
 
 export interface ResearchGuidanceSection extends ScoredItem {
@@ -238,6 +244,7 @@ export interface MembershipEntry {
 	id: string;
 	positionType: string;
 	membershipDetails: string;
+	proofFiles?: string[];
 }
 
 export interface MembershipsSection extends ScoredItem {
@@ -249,6 +256,7 @@ export interface OtherInfoEntry {
 	id: string;
 	details: string;
 	points: number;
+	proofFiles?: string[];
 }
 
 export interface OtherInfoSection extends ScoredItem {
@@ -265,6 +273,7 @@ export interface SocietyActivity {
 	nameOfClub: string;
 	playedLeadRole: boolean;
 	detailsOfActivities: string;
+	proofFiles?: string[];
 }
 
 // SECTION 13B — Departmental Activities & Development
@@ -272,6 +281,7 @@ export interface DepartmentalActivity {
 	id: string;
 	role: string;
 	detailsOfActivities: string;
+	proofFiles?: string[];
 }
 
 // SECTION 13C — Institute Activities & Development
@@ -279,6 +289,7 @@ export interface InstituteActivity {
 	id: string;
 	positionType: string;
 	detailsOfActivities: string;
+	proofFiles?: string[];
 }
 
 // SECTION 13D — Special/Extension/Expert/Invited Lectures Delivered
@@ -286,6 +297,7 @@ export interface LectureActivity {
 	id: string;
 	nature: string;
 	detailsOfActivities: string;
+	proofFiles?: string[];
 }
 
 // SECTION 13E — Articles, Monographs, Technical Reports, Reviews Written
@@ -293,6 +305,7 @@ export interface ArticleActivity {
 	id: string;
 	points: number;
 	detailsOfActivities: string;
+	proofFiles?: string[];
 }
 
 export interface StudentActivitiesForm {

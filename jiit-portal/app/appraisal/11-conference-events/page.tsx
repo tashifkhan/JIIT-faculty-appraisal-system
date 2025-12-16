@@ -39,6 +39,7 @@ import {
 	CalendarIcon,
 } from "lucide-react";
 import AppraisalLayout from "@/components/AppraisalLayout";
+import { FileUpload } from "@/components/FileUpload";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -55,6 +56,7 @@ export default function ConferenceEvents() {
 			organisationPlace: "",
 			attendedOrganized: "attended",
 			programType: "conference",
+			proofFiles: [],
 		},
 	]);
 
@@ -77,6 +79,7 @@ export default function ConferenceEvents() {
 					attendedOrganized: e.attendedOrganized,
 					programType: e.programType || "conference",
 					isChiefOrganiser: e.isChiefOrganiser,
+					proofFiles: e.proofFiles || [],
 				}))
 			);
 			setApiScore(existingData.apiScore ?? null);
@@ -94,6 +97,7 @@ export default function ConferenceEvents() {
 				organisationPlace: "",
 				attendedOrganized: "attended",
 				programType: "conference",
+				proofFiles: [],
 			},
 		]);
 	};
@@ -107,10 +111,22 @@ export default function ConferenceEvents() {
 	const updateEntry = (
 		id: string,
 		field: keyof ConferenceEntry | string,
-		value: string
+		value: any
 	) => {
 		setEntries(
 			entries.map((e) => (e.id === id ? { ...e, [field]: value } : e))
+		);
+	};
+
+	const handleFileSelect = (id: string, base64: string | null) => {
+		setEntries((list) =>
+			list.map((e) => {
+				if (e.id === id) {
+					const newFiles = base64 ? [base64] : [];
+					return { ...e, proofFiles: newFiles };
+				}
+				return e;
+			})
 		);
 	};
 
@@ -407,6 +423,17 @@ export default function ConferenceEvents() {
 											}
 											placeholder="e.g., IIT Delhi, New Delhi"
 										/>
+									</div>
+									<div className="space-y-2">
+										<Label>Proof Document</Label>
+										<div className="py-1">
+											<FileUpload
+												onFileSelect={(base64) =>
+													handleFileSelect(entry.id, base64)
+												}
+												currentFile={entry.proofFiles?.[0]}
+											/>
+										</div>
 									</div>
 								</CardContent>
 							</Card>

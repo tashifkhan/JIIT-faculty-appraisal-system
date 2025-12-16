@@ -13,6 +13,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { FileUpload } from "@/components/FileUpload";
 
 import { APPRAISAL_SECTIONS } from "@/lib/constants";
 import { ReadingMaterialEntry, ReadingMaterialSection } from "@/lib/types";
@@ -39,6 +40,7 @@ export default function ReadingMaterialPage() {
 			coverageBeyondSyllabus: "",
 			selfAssessedApi: 0,
 			hodRemarks: "Pending",
+			proofFiles: [],
 		},
 	]);
 
@@ -60,6 +62,7 @@ export default function ReadingMaterialPage() {
 						...e,
 						id: e.id || crypto.randomUUID(),
 						hodRemarks: e.hodRemarks ?? "Approved",
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -80,6 +83,7 @@ export default function ReadingMaterialPage() {
 				coverageBeyondSyllabus: "",
 				selfAssessedApi: 0,
 				hodRemarks: "Pending",
+				proofFiles: [],
 			},
 		]);
 	};
@@ -97,6 +101,18 @@ export default function ReadingMaterialPage() {
 	) => {
 		setEntries((list) =>
 			list.map((e) => (e.id === id ? { ...e, [key]: value } : e))
+		);
+	};
+
+	const handleFileSelect = (id: string, base64: string | null) => {
+		setEntries((list) =>
+			list.map((e) => {
+				if (e.id === id) {
+					const newFiles = base64 ? [base64] : [];
+					return { ...e, proofFiles: newFiles };
+				}
+				return e;
+			})
 		);
 	};
 
@@ -208,6 +224,16 @@ export default function ReadingMaterialPage() {
 											}
 											placeholder="Coverage Beyond Syllabus"
 										/>
+
+										<div className="py-2">
+											<FileUpload
+												onFileSelect={(base64) =>
+													handleFileSelect(e.id, base64)
+												}
+												currentFile={e.proofFiles?.[0]}
+											/>
+										</div>
+
 										<div className="flex justify-end">
 											<Button
 												variant="ghost"
@@ -253,6 +279,7 @@ export default function ReadingMaterialPage() {
 											<th className="px-4 py-3 text-left">
 												Coverage Beyond Syllabus
 											</th>
+											<th className="px-4 py-3 text-left">Proof</th>
 											<th className="px-4 py-3"></th>
 										</tr>
 									</thead>
@@ -338,6 +365,14 @@ export default function ReadingMaterialPage() {
 															)
 														}
 														placeholder="Beyond syllabus..."
+													/>
+												</td>
+												<td className="px-4 py-3 min-w-[150px]">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelect(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
 													/>
 												</td>
 												<td className="px-2 py-3 text-right">

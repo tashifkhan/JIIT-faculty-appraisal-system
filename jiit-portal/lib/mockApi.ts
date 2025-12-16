@@ -122,6 +122,7 @@ function transformConferenceToBackend(entries: ConferenceEntry[]) {
       is_chief_organizer: entry.isChiefOrganiser === 'yes',
       sponsoring_agency: entry.sponsoringAgency,
       'organisation_&_place': entry.organisationPlace,
+      proof_files: entry.proofFiles,
     };
   });
 }
@@ -238,6 +239,7 @@ function transformReadingMaterialToBackend(entries: ReadingMaterialEntry[]) {
     participatory_methodologies: entry.participatoryMethodologies || "",
     modification_to_syllabus: entry.modificationToSyllabus || "",
     coverage_beyond_syllabus: entry.coverageBeyondSyllabus || "",
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -350,22 +352,27 @@ function transformStudentActivitiesToBackend(data: StudentActivitiesSection) {
       name_of_club: item.nameOfClub,
       played_lead_role: item.playedLeadRole,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     B: data.B.map((item) => ({
       role: item.role,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     C: data.C.map((item) => ({
       position_type: item.positionType,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     D: data.D.map((item) => ({
       nature: item.nature,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
     E: data.E.map((item) => ({
       points: item.points,
       details_of_activities: item.detailsOfActivities,
+      proof_files: item.proofFiles,
     })),
   };
 }
@@ -415,6 +422,7 @@ function transformResearchPapersToBackend(entries: ResearchPaperEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -462,6 +470,7 @@ function transformBooksChaptersToBackend(entries: BookChapterEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -513,6 +522,7 @@ function transformResearchProjectsToBackend(entries: ResearchProjectEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -561,6 +571,7 @@ function transformResearchGuidanceToBackend(entries: ResearchGuidanceEntry[]) {
       name: author.name,
       author_type: author.authorType,
     })),
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -601,6 +612,7 @@ function transformMembershipsToBackend(entries: MembershipEntry[]) {
   return entries.map((entry) => ({
     position_type: entry.positionType,
     membership_details: entry.membershipDetails,
+    proof_files: entry.proofFiles,
   }));
 }
 
@@ -642,12 +654,15 @@ function transformOtherInfoToBackend(data: OtherInfoSection) {
     self: data.self.map((item) => ({
       details: item.details,
       points: item.points,
+      proof_files: item.proofFiles,
     })),
     national: data.national.map((item) => ({
       details: item.details,
+      proof_files: item.proofFiles,
     })),
     international: data.international.map((item) => ({
       details: item.details,
+      proof_files: item.proofFiles,
     })),
   };
 }

@@ -34,6 +34,7 @@ import { APPRAISAL_SECTIONS } from "@/lib/constants";
 import { ArrowLeft, ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { FileUpload } from "@/components/FileUpload"; // Added import
 
 export default function StudentActivitiesPage() {
 	const router = useRouter();
@@ -49,6 +50,7 @@ export default function StudentActivitiesPage() {
 			nameOfClub: "",
 			playedLeadRole: false,
 			detailsOfActivities: "",
+			proofFiles: [],
 		},
 	]);
 
@@ -58,6 +60,7 @@ export default function StudentActivitiesPage() {
 			id: crypto.randomUUID(),
 			role: "",
 			detailsOfActivities: "",
+			proofFiles: [],
 		},
 	]);
 
@@ -67,6 +70,7 @@ export default function StudentActivitiesPage() {
 			id: crypto.randomUUID(),
 			positionType: "",
 			detailsOfActivities: "",
+			proofFiles: [],
 		},
 	]);
 
@@ -76,6 +80,7 @@ export default function StudentActivitiesPage() {
 			id: crypto.randomUUID(),
 			nature: "",
 			detailsOfActivities: "",
+			proofFiles: [],
 		},
 	]);
 
@@ -85,6 +90,7 @@ export default function StudentActivitiesPage() {
 			id: crypto.randomUUID(),
 			points: 0,
 			detailsOfActivities: "",
+			proofFiles: [],
 		},
 	]);
 
@@ -105,6 +111,7 @@ export default function StudentActivitiesPage() {
 					existing.A.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -113,6 +120,7 @@ export default function StudentActivitiesPage() {
 					existing.B.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -121,6 +129,7 @@ export default function StudentActivitiesPage() {
 					existing.C.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -129,6 +138,7 @@ export default function StudentActivitiesPage() {
 					existing.D.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -137,6 +147,7 @@ export default function StudentActivitiesPage() {
 					existing.E.map((e) => ({
 						...e,
 						id: e.id || crypto.randomUUID(),
+						proofFiles: e.proofFiles || [],
 					}))
 				);
 			}
@@ -152,6 +163,7 @@ export default function StudentActivitiesPage() {
 				nameOfClub: "",
 				playedLeadRole: false,
 				detailsOfActivities: "",
+				proofFiles: [],
 			},
 		]);
 	const removeSectionA = (id: string) =>
@@ -175,6 +187,7 @@ export default function StudentActivitiesPage() {
 				id: crypto.randomUUID(),
 				role: "",
 				detailsOfActivities: "",
+				proofFiles: [],
 			},
 		]);
 	const removeSectionB = (id: string) =>
@@ -198,6 +211,7 @@ export default function StudentActivitiesPage() {
 				id: crypto.randomUUID(),
 				positionType: "",
 				detailsOfActivities: "",
+				proofFiles: [],
 			},
 		]);
 	const removeSectionC = (id: string) =>
@@ -221,6 +235,7 @@ export default function StudentActivitiesPage() {
 				id: crypto.randomUUID(),
 				nature: "",
 				detailsOfActivities: "",
+				proofFiles: [],
 			},
 		]);
 	const removeSectionD = (id: string) =>
@@ -244,6 +259,7 @@ export default function StudentActivitiesPage() {
 				id: crypto.randomUUID(),
 				points: 0,
 				detailsOfActivities: "",
+				proofFiles: [],
 			},
 		]);
 	const removeSectionE = (id: string) =>
@@ -271,13 +287,52 @@ export default function StudentActivitiesPage() {
 		[sectionA, sectionB, sectionC, sectionD, sectionE]
 	);
 
+	const handleFileSelectA = (id: string, base64: string | null) => {
+		setSectionA((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+	const handleFileSelectB = (id: string, base64: string | null) => {
+		setSectionB((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+	const handleFileSelectC = (id: string, base64: string | null) => {
+		setSectionC((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+	const handleFileSelectD = (id: string, base64: string | null) => {
+		setSectionD((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+	const handleFileSelectE = (id: string, base64: string | null) => {
+		setSectionE((list) =>
+			list.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
+			)
+		);
+	};
+
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		try {
+			// Remove apiScore to avoid backend validation error
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { apiScore, ...payload } = sectionPayload;
 			const result = await simulateApiCall(
 				"student-activities",
-				sectionPayload
+				payload as any
 			);
 			updateSectionData("studentActivities", sectionPayload, result.score);
 			setApiScore(result.score);
@@ -456,6 +511,14 @@ export default function StudentActivitiesPage() {
 														rows={2}
 													/>
 												</div>
+												<div className="py-2">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelectA(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
+													/>
+												</div>
 												<div className="flex justify-end pt-1">
 													<Button
 														type="button"
@@ -480,8 +543,11 @@ export default function StudentActivitiesPage() {
 													<th className="px-4 py-3 text-left md:w-[15%]">
 														Played Lead Role
 													</th>
-													<th className="px-4 py-3 text-left md:w-[50%]">
+													<th className="px-4 py-3 text-left md:w-[40%]">
 														Details of Activities
+													</th>
+													<th className="px-4 py-3 text-left md:w-[10%]">
+														Proof
 													</th>
 													<th className="px-4 py-3 md:w-[10%]"></th>
 												</tr>
@@ -534,6 +600,14 @@ export default function StudentActivitiesPage() {
 																}
 																placeholder="Describe activities, responsibilities, achievements..."
 																rows={2}
+															/>
+														</td>
+														<td className="p-3">
+															<FileUpload
+																onFileSelect={(base64) =>
+																	handleFileSelectA(e.id, base64)
+																}
+																currentFile={e.proofFiles?.[0]}
 															/>
 														</td>
 														<td className="p-3 text-right">
@@ -623,6 +697,14 @@ export default function StudentActivitiesPage() {
 														rows={2}
 													/>
 												</div>
+												<div className="py-2">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelectB(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
+													/>
+												</div>
 												<div className="flex justify-end pt-1">
 													<Button
 														type="button"
@@ -644,8 +726,11 @@ export default function StudentActivitiesPage() {
 													<th className="px-4 py-3 text-left md:w-[30%]">
 														Role
 													</th>
-													<th className="px-4 py-3 text-left md:w-[60%]">
+													<th className="px-4 py-3 text-left md:w-[50%]">
 														Details of Activities
+													</th>
+													<th className="px-4 py-3 text-left md:w-[10%]">
+														Proof
 													</th>
 													<th className="px-4 py-3 md:w-[10%]"></th>
 												</tr>
@@ -686,6 +771,14 @@ export default function StudentActivitiesPage() {
 																}
 																placeholder="Describe departmental activities and contributions..."
 																rows={2}
+															/>
+														</td>
+														<td className="p-3">
+															<FileUpload
+																onFileSelect={(base64) =>
+																	handleFileSelectB(e.id, base64)
+																}
+																currentFile={e.proofFiles?.[0]}
 															/>
 														</td>
 														<td className="p-3 text-right">
@@ -790,6 +883,14 @@ export default function StudentActivitiesPage() {
 														rows={2}
 													/>
 												</div>
+												<div className="py-2">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelectC(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
+													/>
+												</div>
 												<div className="flex justify-end pt-1">
 													<Button
 														type="button"
@@ -811,8 +912,11 @@ export default function StudentActivitiesPage() {
 													<th className="px-4 py-3 text-left md:w-[30%]">
 														Position Type
 													</th>
-													<th className="px-4 py-3 text-left md:w-[60%]">
+													<th className="px-4 py-3 text-left md:w-[50%]">
 														Details of Activities
+													</th>
+													<th className="px-4 py-3 text-left md:w-[10%]">
+														Proof
 													</th>
 													<th className="px-4 py-3 md:w-[10%]"></th>
 												</tr>
@@ -866,6 +970,14 @@ export default function StudentActivitiesPage() {
 																}
 																placeholder="Describe institute-level activities and responsibilities..."
 																rows={2}
+															/>
+														</td>
+														<td className="p-3">
+															<FileUpload
+																onFileSelect={(base64) =>
+																	handleFileSelectC(e.id, base64)
+																}
+																currentFile={e.proofFiles?.[0]}
 															/>
 														</td>
 														<td className="p-3 text-right">
@@ -958,6 +1070,14 @@ export default function StudentActivitiesPage() {
 														rows={2}
 													/>
 												</div>
+												<div className="py-2">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelectD(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
+													/>
+												</div>
 												<div className="flex justify-end pt-1">
 													<Button
 														type="button"
@@ -979,8 +1099,11 @@ export default function StudentActivitiesPage() {
 													<th className="px-4 py-3 text-left md:w-[30%]">
 														Nature
 													</th>
-													<th className="px-4 py-3 text-left md:w-[60%]">
+													<th className="px-4 py-3 text-left md:w-[50%]">
 														Details of Activities
+													</th>
+													<th className="px-4 py-3 text-left md:w-[10%]">
+														Proof
 													</th>
 													<th className="px-4 py-3 md:w-[10%]"></th>
 												</tr>
@@ -1020,6 +1143,14 @@ export default function StudentActivitiesPage() {
 																}
 																placeholder="Describe lecture topic, venue, audience, date..."
 																rows={2}
+															/>
+														</td>
+														<td className="p-3">
+															<FileUpload
+																onFileSelect={(base64) =>
+																	handleFileSelectD(e.id, base64)
+																}
+																currentFile={e.proofFiles?.[0]}
 															/>
 														</td>
 														<td className="p-3 text-right">
@@ -1110,6 +1241,14 @@ export default function StudentActivitiesPage() {
 														rows={2}
 													/>
 												</div>
+												<div className="py-2">
+													<FileUpload
+														onFileSelect={(base64) =>
+															handleFileSelectE(e.id, base64)
+														}
+														currentFile={e.proofFiles?.[0]}
+													/>
+												</div>
 												<div className="flex justify-end pt-1">
 													<Button
 														type="button"
@@ -1131,8 +1270,11 @@ export default function StudentActivitiesPage() {
 													<th className="px-4 py-3 text-left md:w-[15%]">
 														Points
 													</th>
-													<th className="px-4 py-3 text-left md:w-[75%]">
+													<th className="px-4 py-3 text-left md:w-[65%]">
 														Details of Activities
+													</th>
+													<th className="px-4 py-3 text-left md:w-[10%]">
+														Proof
 													</th>
 													<th className="px-4 py-3 md:w-[10%]"></th>
 												</tr>
@@ -1169,6 +1311,14 @@ export default function StudentActivitiesPage() {
 																}
 																placeholder="Describe article/monograph/report title, publication, impact..."
 																rows={2}
+															/>
+														</td>
+														<td className="p-3">
+															<FileUpload
+																onFileSelect={(base64) =>
+																	handleFileSelectE(e.id, base64)
+																}
+																currentFile={e.proofFiles?.[0]}
 															/>
 														</td>
 														<td className="p-3 text-right">

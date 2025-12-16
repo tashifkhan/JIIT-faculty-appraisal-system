@@ -32,6 +32,7 @@ import { APPRAISAL_SECTIONS, PUBLICATION_TYPES } from "@/lib/constants";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import AppraisalLayout from "@/components/AppraisalLayout";
+import { FileUpload } from "@/components/FileUpload";
 
 export default function ResearchPapers() {
 	const router = useRouter();
@@ -47,6 +48,7 @@ export default function ResearchPapers() {
 			impactFactor: 0,
 			userAuthorType: "",
 			otherAuthors: [],
+			proofFiles: [],
 		},
 	]);
 
@@ -73,6 +75,7 @@ export default function ResearchPapers() {
 						name: author.name || "",
 						authorType: author.authorType || "",
 					})),
+					proofFiles: e.proofFiles || [],
 				}))
 			);
 			setApiScore(existingData.apiScore ?? null);
@@ -91,6 +94,7 @@ export default function ResearchPapers() {
 				impactFactor: 0,
 				userAuthorType: "",
 				otherAuthors: [],
+				proofFiles: [],
 			},
 		]);
 	};
@@ -160,6 +164,14 @@ export default function ResearchPapers() {
 							),
 					  }
 					: e
+			)
+		);
+	};
+
+	const handleFileSelect = (id: string, base64: string | null) => {
+		setEntries(
+			entries.map((e) =>
+				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
 			)
 		);
 	};
@@ -341,6 +353,16 @@ export default function ResearchPapers() {
 												Indexed (Scopus/Web of Science)
 											</Label>
 										</div>
+									</div>
+
+									<div className="space-y-2 border-t pt-4">
+										<Label>Evidence of Publication</Label>
+										<FileUpload
+											onFileSelect={(base64) =>
+												handleFileSelect(entry.id, base64)
+											}
+											currentFile={entry.proofFiles?.[0]}
+										/>
 									</div>
 
 									{/* Other Authors Section */}

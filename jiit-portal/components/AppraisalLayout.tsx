@@ -29,7 +29,14 @@ export default function AppraisalLayout({ children }: AppraisalLayoutProps) {
 	);
 	const [appraisalData, setAppraisalData] = useState(getAppraisalData());
 	const { data: session, status } = useSession();
-	const user = (session?.user as any) ?? getUser();
+	const user =
+		(session?.user as {
+			name?: string | null;
+			email?: string | null;
+			image?: string | null;
+			department?: string;
+			id?: string;
+		}) ?? getUser();
 
 	useEffect(() => {
 		// Wait for NextAuth session to resolve. If no NextAuth session AND no localStorage auth, redirect to login
@@ -53,7 +60,7 @@ export default function AppraisalLayout({ children }: AppraisalLayoutProps) {
 		// Clear NextAuth session and localStorage data
 		try {
 			await signOut({ redirect: false });
-		} catch (e) {
+		} catch {
 			// ignore
 		}
 		logout();

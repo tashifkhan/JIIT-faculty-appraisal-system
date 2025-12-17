@@ -111,7 +111,7 @@ export default function ConferenceEvents() {
 	const updateEntry = (
 		id: string,
 		field: keyof ConferenceEntry | string,
-		value: any
+		value: string
 	) => {
 		setEntries(
 			entries.map((e) => (e.id === id ? { ...e, [field]: value } : e))

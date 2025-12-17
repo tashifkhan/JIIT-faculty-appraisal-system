@@ -37,7 +37,8 @@ export async function POST(req: Request) {
             // User is verified, can proceed with NextAuth login
             return NextResponse.json({
                 verified: true,
-                message: "User is verified, proceed with login"
+                message: "User is verified, proceed with login",
+                userId: user._id.toString()
             });
         }
 

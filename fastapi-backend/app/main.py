@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.api.endpoints import ingestion
+from app.api.endpoints import ingestion, faculty
 from app.db.mongo import mongo_client
 
 
@@ -27,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(ingestion.router, prefix="/api", tags=["ingestion"])
+app.include_router(faculty.router, prefix="/api", tags=["faculty"])
 
 
 @app.get("/")

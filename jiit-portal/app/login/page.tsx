@@ -95,9 +95,7 @@
 // 	);
 // }
 
-
 //hiding this auth to check if nodemailer works will change this later
-
 
 "use client";
 
@@ -108,156 +106,168 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import Image from "next/image";
 
 export default function Login() {
-  const router = useRouter();
-  
-  // 'identifier' can be either Email (shikha.mehta@jiit.ac.in) or Code (JIIT1137)
-  const [identifier, setIdentifier] = useState(""); 
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+	// 'identifier' can be either Email (shikha.mehta@jiit.ac.in) or Code (JIIT1137)
+	const [identifier, setIdentifier] = useState("");
+	const [password, setPassword] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
-    try {
-      // Step 1: Call our custom login API to check credentials and handle OTP if needed
-      const loginRes = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-      });
+	const handleLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsLoading(true);
 
-      const loginData = await loginRes.json();
+		try {
+			// Step 1: Call our custom login API to check credentials and handle OTP if needed
+			const loginRes = await fetch("/api/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ identifier, password }),
+			});
 
-      if (!loginRes.ok) {
-        // Login failed (wrong credentials, user not found, etc.)
-        toast.error(loginData.error || "Invalid credentials");
-        setIsLoading(false);
-        return;
-      }
+			const loginData = await loginRes.json();
 
-      // Step 2: Check if OTP is required (first-time login)
-      if (loginData.requiresOtp) {
-        toast.info("First login detected. An OTP has been sent to your registered email.");
-        router.push(`/verify-otp?identifier=${encodeURIComponent(identifier)}`);
-        setIsLoading(false);
-        return;
-      }
+			if (!loginRes.ok) {
+				// Login failed (wrong credentials, user not found, etc.)
+				toast.error(loginData.error || "Invalid credentials");
+				setIsLoading(false);
+				return;
+			}
 
-      // Step 3: User is verified, proceed with NextAuth sign in
-      if (loginData.verified) {
-        const res = await signIn("credentials", {
-          identifier,
-          password,
-          redirect: false,
-        });
+			// Step 2: Check if OTP is required (first-time login)
+			if (loginData.requiresOtp) {
+				toast.info(
+					"First login detected. An OTP has been sent to your registered email."
+				);
+				router.push(`/verify-otp?identifier=${encodeURIComponent(identifier)}`);
+				setIsLoading(false);
+				return;
+			}
 
-        if (res?.error) {
-          toast.error("Authentication failed. Please try again.");
-        } else {
-          toast.success("Login successful!");
-          // Hardcoded HOD redirect
-          if (identifier.trim().toUpperCase() === "JIIT1137") {
-            router.push("/hod/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+			// Step 3: User is verified, proceed with NextAuth sign in
+			if (loginData.verified) {
+				const res = await signIn("credentials", {
+					identifier,
+					password,
+					redirect: false,
+				});
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-md shadow-xl border-t-4 border-t-primary">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl bg-white shadow-sm p-2">
-            {/* Make sure logo.png exists in your /public folder */}
-            <Image 
-              src="/logo.png" 
-              alt="JIIT Logo" 
-              width={96} 
-              height={96} 
-              className="object-contain"
-              priority
-            />
-          </div>
-          <CardTitle className="text-2xl pt-2 font-bold text-primary">
-            Faculty Appraisal Portal
-          </CardTitle>
-          <CardDescription>
-            Sign in to submit your Annual Performance Appraisal Report (APAR)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="identifier">Employee Code or Email Address</Label>
-              <Input
-                id="identifier"
-                type="text"
-                placeholder="e.g., JIIT1137 or faculty@jiit.ac.in"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                required
-                className="h-11"
-                autoFocus
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                {/* Optional: Add Forgot Password link here later */}
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11"
-              />
-            </div>
+				if (res?.error) {
+					toast.error("Authentication failed. Please try again.");
+				} else {
+					toast.success("Login successful!");
 
-            <Button 
-              type="submit" 
-              className="w-full h-11 text-base font-medium transition-all" 
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  <span>Signing in...</span>
-                </div>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
-          
-          <div className="mt-6 text-center text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
-            <p><strong>First time logging in?</strong></p>
-            <p>Use your Employee Code and the default password provided by administration. You will be asked to verify via email OTP.</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+					if (loginData.userId) {
+						localStorage.setItem("user_id", loginData.userId);
+					}
+
+					// Hardcoded HOD redirect
+					if (identifier.trim().toUpperCase() === "JIIT1137") {
+						router.push("/hod/dashboard");
+					} else {
+						router.push("/dashboard");
+					}
+				}
+			}
+		} catch (error) {
+			console.error("Login error:", error);
+			toast.error("An unexpected error occurred. Please try again.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	return (
+		<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+			<Card className="w-full max-w-md shadow-xl border-t-4 border-t-primary">
+				<CardHeader className="space-y-3 text-center">
+					<div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl bg-white shadow-sm p-2">
+						{/* Make sure logo.png exists in your /public folder */}
+						<Image
+							src="/logo.png"
+							alt="JIIT Logo"
+							width={96}
+							height={96}
+							className="object-contain"
+							priority
+						/>
+					</div>
+					<CardTitle className="text-2xl pt-2 font-bold text-primary">
+						Faculty Appraisal Portal
+					</CardTitle>
+					<CardDescription>
+						Sign in to submit your Annual Performance Appraisal Report (APAR)
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form onSubmit={handleLogin} className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="identifier">Employee Code or Email Address</Label>
+							<Input
+								id="identifier"
+								type="text"
+								placeholder="e.g., JIIT1137 or faculty@jiit.ac.in"
+								value={identifier}
+								onChange={(e) => setIdentifier(e.target.value)}
+								required
+								className="h-11"
+								autoFocus
+							/>
+						</div>
+
+						<div className="space-y-2">
+							<div className="flex items-center justify-between">
+								<Label htmlFor="password">Password</Label>
+								{/* Optional: Add Forgot Password link here later */}
+							</div>
+							<Input
+								id="password"
+								type="password"
+								placeholder="••••••••"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								required
+								className="h-11"
+							/>
+						</div>
+
+						<Button
+							type="submit"
+							className="w-full h-11 text-base font-medium transition-all"
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<div className="flex items-center gap-2">
+									<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+									<span>Signing in...</span>
+								</div>
+							) : (
+								"Sign In"
+							)}
+						</Button>
+					</form>
+
+					<div className="mt-6 text-center text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
+						<p>
+							<strong>First time logging in?</strong>
+						</p>
+						<p>
+							Use your Employee Code and the default password provided by
+							administration. You will be asked to verify via email OTP.
+						</p>
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }

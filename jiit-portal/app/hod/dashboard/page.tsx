@@ -14,6 +14,7 @@ import {
 	FileCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
 	Card,
 	CardContent,
@@ -53,7 +54,8 @@ export default function HODDashboard() {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await getAllFacultyData();
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const response = (await getAllFacultyData()) as { result: any[] };
 				if (response?.result) {
 					// Start with empty list
 					const processedList: Faculty[] = [];
@@ -280,10 +282,12 @@ export default function HODDashboard() {
 														key={idx}
 														className="relative group overflow-hidden rounded-md border aspect-[3/4]"
 													>
-														<img
+														<Image
 															src={imgSrc}
 															alt={`Proof ${idx + 1}`}
-															className="object-cover w-full h-full transition-transform hover:scale-105"
+															fill
+															className="object-cover transition-transform hover:scale-105"
+															unoptimized
 														/>
 														<div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 															<Button

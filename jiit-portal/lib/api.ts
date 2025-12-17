@@ -223,7 +223,7 @@ export function getBackendSectionKey(frontendSectionId: string): string {
 /**
  * Get all faculty appraisal data for HOD dashboard
  */
-export async function getAllFacultyData(): Promise<any> {
+export async function getAllFacultyData(): Promise<unknown> {
     const result = await apiGet(API_ENDPOINTS.GET_ALL_FACULTY_DATA);
     return result;
 }

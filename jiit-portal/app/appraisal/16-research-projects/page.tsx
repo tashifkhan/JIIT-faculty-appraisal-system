@@ -42,7 +42,7 @@ import {
 	Trash2,
 	CalendarIcon,
 } from "lucide-react";
-import { FileUpload } from "@/components/FileUpload";
+
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -186,14 +186,6 @@ export default function ResearchProjectsPage() {
 							),
 					  }
 					: e
-			)
-		);
-	};
-
-	const handleFileSelect = (id: string, base64: string | null) => {
-		setEntries((prev) =>
-			prev.map((e) =>
-				e.id === id ? { ...e, proofFiles: base64 ? [base64] : [] } : e
 			)
 		);
 	};

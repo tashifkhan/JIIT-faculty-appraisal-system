@@ -332,7 +332,7 @@ export default function StudentActivitiesPage() {
 			const { apiScore, ...payload } = sectionPayload;
 			const result = await simulateApiCall(
 				"student-activities",
-				payload as any
+				payload as unknown
 			);
 			updateSectionData("studentActivities", sectionPayload, result.score);
 			setApiScore(result.score);
